@@ -9,6 +9,14 @@ import cookieParser from 'cookie-parser'
 import cors from 'cors'
 import { ResolverContext } from './types'
 import { UserResolver } from './resolvers/user/UserResolver'
+import { Log } from './utils/log'
+import { verify } from 'jsonwebtoken'
+import { User } from './entities/user/User'
+import {
+  createAccessToken,
+  createRefreshToken,
+  sendRefreshToken
+} from './utils/auth'
 
 const main = async () => {
   const orm = await MikroORM.init(mikroConfig)
@@ -25,6 +33,36 @@ const main = async () => {
 
   app.use(cookieParser())
 
+  app.post('/refresh-token', async (req, res) => {
+    const token = req.cookies[process.env.COOKIE_NAME as string]
+
+    if (!token) {
+      return res.send({ ok: false, accessToken: '' })
+    }
+
+    let payload: any = null
+
+    try {
+      payload = verify(token, process.env.REFRESH_TOKEN_SECRET as string)
+    } catch (error) {
+      Log(error)
+      return res.send({ ok: false, accessToken: '' })
+    }
+
+    const user = await orm.em.findOne(User, { id: payload.userId })
+
+    if (!user) {
+      return res.send({ ok: false, accessToken: '' })
+    }
+
+    if (user.tokenVersion !== payload.tokenVersion) {
+      return res.send({ ok: false, accessToken: '' })
+    }
+
+    sendRefreshToken(res, createRefreshToken(user))
+    return res.send({ ok: true, accessToken: createAccessToken(user) })
+  })
+
   const apolloServer = new ApolloServer({
     schema: await buildSchema({
       resolvers: [UserResolver],
@@ -36,10 +74,10 @@ const main = async () => {
   apolloServer.applyMiddleware({ app, cors: false })
 
   app.listen(4000, () => {
-    console.log('server running on localhost:4000')
+    Log('server running on localhost:4000')
   })
 }
 
 main().catch((err) => {
-  console.log(err)
+  Log(err)
 })

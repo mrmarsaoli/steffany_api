@@ -14,4 +14,8 @@ export class User {
 
   @Property({ columnType: 'text' })
   password!: string
+
+  @Field(() => Int)
+  @Property({ default: 0 })
+  tokenVersion: number
 }
