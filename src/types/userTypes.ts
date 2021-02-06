@@ -3,7 +3,19 @@ import { FieldError } from '.'
 import { User } from '../entities/user/User'
 
 /**
- * User register/login response scheme
+ * User register, auth, login input type
+ */
+@InputType()
+export class UserInput {
+  @Field()
+  email: string
+
+  @Field()
+  password: string
+}
+
+/**
+ * User register, auth, login response scheme
  */
 @ObjectType()
 export class UserResponse {
@@ -15,16 +27,4 @@ export class UserResponse {
 
   @Field(() => String, { nullable: true })
   accessToken?: string
-}
-
-/**
- * User register/login input type
- */
-@InputType()
-export class UserInput {
-  @Field()
-  email: string
-
-  @Field()
-  password: string
 }

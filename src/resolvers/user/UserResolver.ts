@@ -1,3 +1,4 @@
+import 'dotenv/config'
 import {
   Arg,
   Ctx,
@@ -162,5 +163,14 @@ export class UserResolver {
       errors,
       accessToken: createAccessToken(user)
     }
+  }
+
+  /**
+   * Account logout
+   */
+  @Mutation(() => Boolean)
+  logout(@Ctx() { res }: ResolverContext) {
+    res.clearCookie(process.env.COOKIE_NAME as string)
+    return true
   }
 }
