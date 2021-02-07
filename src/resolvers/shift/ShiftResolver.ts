@@ -8,9 +8,9 @@ import {
   Resolver,
   UseMiddleware
 } from 'type-graphql'
-import { Shift } from '~/src/entities/shift/Shift'
-import { isAuth } from '~/src/middlewares/isAuth'
-import { FieldError, InputOptions, ResolverContext } from '~/src/types'
+import { Shift } from '../../entities/shift/Shift'
+import { isAuth } from '../../middlewares/isAuth'
+import { FieldError, InputOptions, ResolverContext } from '../../types'
 import {
   CreateShiftInput,
   ShiftResponse,
@@ -20,8 +20,8 @@ import {
   EditShiftInput,
   PublishShiftResponse,
   BulkingError
-} from '~/src/types/shiftTypes'
-import { Log } from '~/src/utils/log'
+} from '../../types/shiftTypes'
+import { Log } from '../../utils/log'
 
 @Resolver(Shift)
 export class ShiftResolver {
