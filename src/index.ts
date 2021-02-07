@@ -8,7 +8,6 @@ import { buildSchema } from 'type-graphql'
 import cookieParser from 'cookie-parser'
 import cors from 'cors'
 import { ResolverContext } from './types'
-import { UserResolver } from './resolvers/user/UserResolver'
 import { Log } from './utils/log'
 import { verify } from 'jsonwebtoken'
 import { User } from './entities/user/User'
@@ -17,6 +16,8 @@ import {
   createRefreshToken,
   sendRefreshToken
 } from './utils/auth'
+import { UserResolver } from './resolvers/user/UserResolver'
+import { ShiftResolver } from './resolvers/shift/ShiftResolver'
 
 const main = async () => {
   const orm = await MikroORM.init(mikroConfig)
@@ -65,7 +66,7 @@ const main = async () => {
 
   const apolloServer = new ApolloServer({
     schema: await buildSchema({
-      resolvers: [UserResolver],
+      resolvers: [UserResolver, ShiftResolver],
       validate: false
     }),
     context: ({ req, res }): ResolverContext => ({ em: orm.em, req, res })
