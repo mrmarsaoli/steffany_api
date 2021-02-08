@@ -58,7 +58,7 @@ export class CreateShiftInput {
   @Field(() => Date)
   end: Date
 
-  @Field(() => String)
+  @Field(() => Int)
   published: number
 }
 

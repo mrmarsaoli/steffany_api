@@ -26,6 +26,50 @@ import { Log } from '../../utils/log'
 @Resolver(Shift)
 export class ShiftResolver {
   /**
+   * Shift detail
+   */
+  @UseMiddleware(isAuth)
+  @Query(() => ShiftResponse)
+  async shift(
+    @Arg('id', () => Int) id: number,
+    @Ctx() { em, payload }: ResolverContext
+  ): Promise<ShiftResponse> {
+    const userId = Number(payload!.userId)
+
+    if (!userId) {
+      return {
+        errors: [
+          {
+            field: 'user',
+            message: 'you are not allowed to see these shifts'
+          }
+        ]
+      }
+    }
+
+    const shift = await em.findOne(
+      Shift,
+      { id },
+      {
+        populate: ['user']
+      }
+    )
+
+    if (!shift) {
+      return {
+        errors: [
+          {
+            field: 'shift',
+            message: 'shift does not exist'
+          }
+        ]
+      }
+    }
+
+    return { shift, errors: [] }
+  }
+
+  /**
    * List of shifts
    */
   @UseMiddleware(isAuth)
@@ -233,7 +277,7 @@ export class ShiftResolver {
       }
     }
 
-    const shift = await em.findOne(Shift, { id })
+    const shift = await em.findOne(Shift, { id }, { populate: ['user'] })
 
     if (!shift) {
       return {
@@ -244,14 +288,16 @@ export class ShiftResolver {
       }
     }
 
-    if (shift.user.id !== userId) {
-      return {
-        error: {
-          field: 'user',
-          message: 'you can only delete your own shift'
-        }
-      }
-    }
+    Log(shift.user)
+
+    // if (shift.user.id !== userId) {
+    //   return {
+    //     error: {
+    //       field: 'user',
+    //       message: 'you can only delete your own shift'
+    //     }
+    //   }
+    // }
 
     if (shift.published) {
       return {
@@ -295,15 +341,15 @@ export class ShiftResolver {
     const shifts = await em.find(Shift, { id: ids })
 
     shifts.forEach(async (item) => {
-      if (item.user.id !== userId) {
-        bulkingErrors.push({
-          id: item.id,
-          field: 'user',
-          message: 'you can only published your own shift'
-        })
+      // if (item.user.id !== userId) {
+      //   bulkingErrors.push({
+      //     id: item.id,
+      //     field: 'user',
+      //     message: 'you can only published your own shift'
+      //   })
 
-        return
-      }
+      //   return
+      // }
 
       item.published = 1
 
