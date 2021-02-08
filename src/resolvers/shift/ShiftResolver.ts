@@ -213,16 +213,16 @@ export class ShiftResolver {
       }
     }
 
-    if (shift.user.id !== userId) {
-      return {
-        errors: [
-          {
-            field: 'shift',
-            message: `you can only edit your own shift`
-          }
-        ]
-      }
-    }
+    // if (shift.user.id !== userId) {
+    //   return {
+    //     errors: [
+    //       {
+    //         field: 'shift',
+    //         message: `you can only edit your own shift`
+    //       }
+    //     ]
+    //   }
+    // }
 
     if (shift.published) {
       return {
